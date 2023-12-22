@@ -108,14 +108,88 @@ public class TicTacToeServer extends Application implements TicTacToeConstants {
                 toPlayer1.writeInt(1);
 
                 while (true) {
+
+                    // receive a move from player 1
                     int row = fromPlayer1.readInt();
                     int column = fromPlayer1.readInt();
                     cell[row][column] = 'X';
+
+                    // check if player 1 won
+                    if (isWon('X')) {
+                        toPlayer1.writeInt(PLAYER1_WON);
+                        toPlayer2.writeInt(PLAYER1_WON);
+
+                        // show player1's updated move on player 2's side
+                        sendMove(toPlayer2, row, column);
+                        break;
+                    } else if (isFull()) {
+                        toPlayer1.writeInt(DRAW);
+                        toPlayer2.writeInt(DRAW);
+                        // show player1's updated move on player 2's side
+                        sendMove(toPlayer2, row, column);
+                        break;
+                    } else {
+                        toPlayer2.writeInt(CONTINUE);
+                        // show player1's updated move on player 2's side
+                        sendMove(toPlayer2, row, column);
+                    }
+
+                    // now we handle player 2's  input
+                    row = fromPlayer2.readInt();
+
 
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+        }
+
+        private void sendMove(DataOutputStream out, int row, int column) throws IOException {
+
+            // send row index
+            out.writeInt(row);
+
+            // send column index
+            out.write(column);
+        }
+
+        private boolean isFull() {
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 3; j++) {
+                    if (cell[i][j] == ' ') {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        private boolean isWon(char token) {
+
+            // check all rows
+            for (int i = 0; i < 3; i++) {
+                if (cell[i][0] == token && cell[i][1] == token && cell[i][2] == token) {
+                    return true;
+                }
+            }
+
+            // check all cols
+            for (int i = 0; i < 3; i++) {
+                if (cell[0][i] == token && cell[1][i] == token && cell[2][i] == token) {
+                    return true;
+                }
+            }
+
+            // check diagonals
+            if (cell[0][0] == token && cell[1][1] == token && cell[2][2] == token) {
+                return true;
+            }
+
+            if (cell[0][2] == token && cell[1][1] == token && cell[2][0] == token) {
+                return true;
+            }
+
+            return false;
         }
     }
 }
