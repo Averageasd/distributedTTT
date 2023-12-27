@@ -58,11 +58,17 @@ public class TicTacToeServer extends Application implements TicTacToeConstants {
                     // announce player 2 joined
                     Platform.runLater(() -> {
                         taLog.appendText(new Date() + " Player 2 joined session " + sessionNo + '\n');
-                        taLog.appendText("Player 2's IP address " + player1.getInetAddress().getHostAddress() + '\n');
+                        taLog.appendText("Player 2's IP address " + player2.getInetAddress().getHostAddress() + '\n');
                     });
 
                     // notify to player 2 that they successfully joined
                     new DataOutputStream(player1.getOutputStream()).writeInt(PLAYER2);
+
+                    Platform.runLater(() -> {
+                        taLog.appendText(new Date() + ": Start a thread for session " + sessionNo++ + '\n');
+                    });
+
+                    new Thread(new HandleSession(player1, player2)).start();
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -136,8 +142,19 @@ public class TicTacToeServer extends Application implements TicTacToeConstants {
 
                     // now we handle player 2's  input
                     row = fromPlayer2.readInt();
+                    column = fromPlayer2.readInt();
+                    cell[row][column] = 'O';
 
-
+                    if (isWon('O')) {
+                        toPlayer1.writeInt(PLAYER2_WON);
+                        toPlayer2.writeInt(PLAYER2_WON);
+                        sendMove(toPlayer1, row, column);
+                        break;
+                    }
+                    else{
+                        toPlayer1.writeInt(CONTINUE);
+                        sendMove(toPlayer1, row, column);
+                    }
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);
