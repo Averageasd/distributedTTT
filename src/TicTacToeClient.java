@@ -129,6 +129,7 @@ public class TicTacToeClient extends Application
                         receiveInfoFromServer(); // Receive info from the server
                     }
                     else if (player == PLAYER2) {
+                        System.out.println("cur player " + player);
                         receiveInfoFromServer(); // Receive info from the server
                         waitForPlayerAction(); // Wait for player 2 to move
                         sendMove(); // Send player 2's move to the server
@@ -199,6 +200,7 @@ public class TicTacToeClient extends Application
             receiveMove();
             Platform.runLater(() -> lblStatus.setText("My turn"));
             myTurn = true; // It is my turn
+            System.out.println("my turn is " + myTurn);
         }
     }
 
@@ -206,6 +208,7 @@ public class TicTacToeClient extends Application
         // Get the other player's move
         int row = fromServer.readInt();
         int column = fromServer.readInt();
+        System.out.println("row and col received " + row + " " + column);
         Platform.runLater(() -> cell[row][column].setToken(otherToken));
     }
 

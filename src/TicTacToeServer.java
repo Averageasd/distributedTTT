@@ -62,7 +62,7 @@ public class TicTacToeServer extends Application implements TicTacToeConstants {
                     });
 
                     // notify to player 2 that they successfully joined
-                    new DataOutputStream(player1.getOutputStream()).writeInt(PLAYER2);
+                    new DataOutputStream(player2.getOutputStream()).writeInt(PLAYER2);
 
                     Platform.runLater(() -> {
                         taLog.appendText(new Date() + ": Start a thread for session " + sessionNo++ + '\n');
@@ -167,7 +167,7 @@ public class TicTacToeServer extends Application implements TicTacToeConstants {
             out.writeInt(row);
 
             // send column index
-            out.write(column);
+            out.writeInt(column);
         }
 
         private boolean isFull() {
